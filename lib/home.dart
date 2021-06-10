@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:undangan/undanganList.dart';
 import 'qr.dart';
+import 'select_figure.dart';
+import 'package:undangan/model/Undangan.dart';
+import 'package:undangan/webservice/apiUndangan.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  ApiUndangan? apiUndangan;
+  @override
+  void initState() {
+    super.initState();
+    apiUndangan = ApiUndangan();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Aplikasi Kehadiran Undangan"),
-        leading: Icon(Icons.people_alt),
+        title: Text('E-INVITATION'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.redAccent, size: 30),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SelectFigure()),
+            );
+          },
+        ),
+        backgroundColor: Colors.cyan,
       ),
       body: Container(
         alignment: Alignment.center,
@@ -27,9 +53,12 @@ class Home extends StatelessWidget {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => UndanganList()));
                 },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.cyan
+                ),
                 child: Text(
                   "Daftar Undangan",
-                  style: TextStyle(fontSize: 40, color: Colors.cyanAccent),
+                  style: TextStyle(fontSize: 40, color: Colors.white),
                 ),
               ),
             ),
@@ -43,9 +72,12 @@ class Home extends StatelessWidget {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => QRViewExample()));
                 },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.cyan
+                ),
                 child: Text(
                   "Cek QR",
-                  style: TextStyle(fontSize: 40, color: Colors.cyanAccent),
+                  style: TextStyle(fontSize: 40, color: Colors.white),
                 ),
               ),
             ),
@@ -56,23 +88,77 @@ class Home extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Card(
-                    child: ListTile(
-                      leading: Icon(Icons.people),
-                      title: Text("Total Undangan : 9"),
+                    child: FutureBuilder<List<Undangan>?>(
+                        future: apiUndangan!.getUndanganAll(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot<List<Undangan>?> snapshot) {
+                          if (snapshot.hasError) {
+                            print(snapshot.error.toString());
+                            return Center(
+                              child: Text("Error ${snapshot.error.toString()}"),
+                            );
+                          } else if (snapshot.hasData) {
+                            List<Undangan>? _undangan = snapshot.data;
+                            if (_undangan != null) {
+                              return ListTile(
+                                  leading: Icon(Icons.people),
+                              title: Text("Total Undangan : ${_undangan.length}"));
+                            } else {
+                              return Text("0");
+                            }
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        }),
                     ),
+                  Card(
+                    child:FutureBuilder<List<Undangan>?>(
+                        future: apiUndangan!.getUndanganHadir(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot<List<Undangan>?> snapshot) {
+                          if (snapshot.hasError) {
+                            print(snapshot.error.toString());
+                            return Center(
+                              child: Text("Error ${snapshot.error.toString()}"),
+                            );
+                          } else if (snapshot.hasData) {
+                            List<Undangan>? _undangan = snapshot.data;
+                            if (_undangan != null) {
+                              return ListTile(
+                                leading: Icon(Icons.star, color: Colors.blue),
+                                title: Text("Hadir : ${_undangan.length}"));
+                            } else {
+                              return Text("0");
+                            }
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        }),
                   ),
                   Card(
-                    child: ListTile(
-                      leading: Icon(Icons.star, color: Colors.blue),
-                      title: Text("Hadir : 8"),
+                    child: FutureBuilder<List<Undangan>?>(
+                        future: apiUndangan!.getUndanganTidakHadir(),
+                        builder:
+                            (BuildContext context, AsyncSnapshot<List<Undangan>?> snapshot) {
+                          if (snapshot.hasError) {
+                            print(snapshot.error.toString());
+                            return Center(
+                              child: Text("Error ${snapshot.error.toString()}"),
+                            );
+                          } else if (snapshot.hasData) {
+                            List<Undangan>? _undangan = snapshot.data;
+                            if (_undangan != null) {
+                              return  ListTile(
+                                  leading: Icon(Icons.star),
+                              title: Text("Belum Hadir : ${_undangan.length}"));
+                            } else {
+                              return Text("0");
+                            }
+                          } else {
+                            return CircularProgressIndicator();
+                          }
+                        }),
                     ),
-                  ),
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.star),
-                      title: Text("Belum Hadir : 2"),
-                    ),
-                  ),
                 ],
               ),
             ),

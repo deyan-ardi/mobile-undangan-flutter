@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:undangan/model/Undangan.dart';
 import 'package:undangan/webservice/apiUndangan.dart';
-
+import 'home.dart';
 class UndanganList extends StatefulWidget {
   const UndanganList({Key? key}) : super(key: key);
 
@@ -48,7 +48,18 @@ class _UndanganListState extends State<UndanganList> {
   Widget _buildListView(List<Undangan> undangan) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("List Undangan"),
+        title: Text('E-INVITATION'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.redAccent, size: 30),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Home()),
+            );
+          },
+        ),
+        backgroundColor: Colors.cyan,
       ),
       body: Container(
         child: Column(
@@ -82,7 +93,10 @@ class _UndanganListState extends State<UndanganList> {
             Expanded(
               flex: 1,
               child: ElevatedButton(
-                child: Text("Reset Kehadiran"),
+                child: Text("Reset Kehadiran",style: TextStyle(fontSize: 18),),
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.cyan
+                ),
                 onPressed: () {
                   apiUndangan!.resetKehadiran();
                   setState(() {});

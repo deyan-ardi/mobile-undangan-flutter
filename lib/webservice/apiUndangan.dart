@@ -15,6 +15,28 @@ class ApiUndangan {
     }
   }
 
+  //Get undangan hadir
+  Future<List<Undangan>?> getUndanganHadir() async {
+    final response = await http.get(Uri.parse(url+"?hadir=1"));
+    if (response.statusCode == 200) {
+      return undanganFromJson(response.body);
+    } else {
+      print("Error ${response.toString()}");
+      return null;
+    }
+  }
+
+  //Get undangan tidak hadir
+  Future<List<Undangan>?> getUndanganTidakHadir() async {
+    final response = await http.get(Uri.parse(url+"?hadir=0"));
+    if (response.statusCode == 200) {
+      return undanganFromJson(response.body);
+    } else {
+      print("Error ${response.toString()}");
+      return null;
+    }
+  }
+
   // Cek kehadiran undangan
   Future<Undangan?> cekUndangan(String email) async {
     final response = await http
